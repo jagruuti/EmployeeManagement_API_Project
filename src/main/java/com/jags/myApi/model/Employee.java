@@ -1,9 +1,9 @@
 package com.jags.myApi.model;
 
 import jakarta.persistence.*;
-
-@Entity
-@Table(name="employees")
+// Not using model anymore
+//@Entity
+//@Table(name="employees")
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

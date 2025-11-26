@@ -1,8 +1,14 @@
 package com.jags.myApi.controller;
 
-import com.jags.myApi.model.Employee;
+import com.jags.myApi.dto.employeeRequestDTO;
+import com.jags.myApi.dto.employeeResponseDTO;
+import com.jags.myApi.entity.Employee;
 import com.jags.myApi.service.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -12,40 +18,54 @@ import java.util.List;
 @RequestMapping("/api/employees")
 public class EmployeeController {
 
-    private final EmployeeService service;
+    @Autowired
+    private EmployeeService service;
     public EmployeeController(EmployeeService service) {
         this.service = service;
     }
-    private List<Employee> employees=new ArrayList<>(List.of(
-            new Employee(1, "John", "Developer"),
-            new Employee(2, "Jane", "Tester")
-    ));
+//    private List<Employee> employees=new ArrayList<>(List.of(
+//            new employeeRequestDTO("John", "Developer"),
+//            new Employee(2, "Jane", "Tester")
+//    ));
 
-    @GetMapping
-    public List<Employee> getEmployees() {
-       // return employees;
-        return service.getAllEmployees();
-    }
+//    @GetMapping
+//    public List<Employee> getEmployees() {
+//       // return employees;
+//        return service.getAllEmployees();
+//    }
+
+        @GetMapping
+        public List<employeeResponseDTO> getAll(){
+        return service.getAll();
+        }
 
     @Operation(summary = "Get employee by Id.", description = "Fetch employee details using ID." )
-    @GetMapping("/{id}")
-    public Employee getEmployeeById(@PathVariable int id) {
-//        return employees.stream()
-//                .filter(e->e.getId()== id)
-//                .findFirst()
-//                .orElse(null);
-        return service.getEmployeeById(id);
+    @GetMapping("/employee")
+    public employeeResponseDTO getEmployeeById(
+            @Parameter(description = "Employee ID", required = true)
+            @RequestParam Long id){
+                return service.getEmployeeById(id);
     }
-
+//    public Employee getEmployeeById(@PathVariable int id) {
+////        return employees.stream()
+////                .filter(e->e.getId()== id)
+////                .findFirst()
+////                .orElse(null);
+//        return service.getEmployeeById(id);
+//    }
     @PostMapping
-    public Employee addEmployee(@RequestBody Employee employee) {
-//        employees.add(employee);
-//        return employee;
-        return service.addEmployee(employee);
+    public ResponseEntity<employeeResponseDTO> createEmployee(@Valid @RequestBody employeeRequestDTO dto) {
+        return ResponseEntity.ok(service.create(dto));
     }
+//    @PostMapping
+//    public Employee addEmployee(@RequestBody Employee employee) {
+////        employees.add(employee);
+////        return employee;
+//        return service.addEmployee(employee);
+//    }
 
-    @DeleteMapping("/{id}")
-    public void deleteEmployee(@PathVariable int id) {
-        service.deleteEmployee(id);
-    }
+//    @DeleteMapping("/{id}")
+//    public void deleteEmployee(@PathVariable int id) {
+//        service.deleteEmployee(id);
+//    }
 }

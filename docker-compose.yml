@@ -10,20 +10,36 @@ services:
       MYSQL_USER: springuser
       MYSQL_PASSWORD: Spring@123
     ports:
-      - "3306:3306"
+    - "3306:3306"
+ #   - "localhost:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
-      - mysql_data:/var/lib/mysqldm
+      - mysql_data:/var/lib/mysql
+
+  postgres:
+    image: postgres:15
+    container_name: local_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: myapi_db
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
 
   springboot-app:
     build: .
     container_name: myapi
     depends_on:
-      - mysql
+       mysql:
+         condition: service_healthy
     ports:
       - "8080:8080"
     environment:
@@ -31,9 +47,20 @@ services:
       SPRING_DATASOURCE_USERNAME: springuser
       SPRING_DATASOURCE_PASSWORD: Spring@123
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-d4ctauadbo4c73dg3utg-a:5432/myapi_db_ev01?sslmode=require
+#      SPRING_DATASOURCE_USERNAME: myapi_db_ev01_user
+#      SPRING_DATASOURCE_PASSWORD: gFYwp83w0ZAqJe5N5BVxfIhGPOyfpmW6
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+#      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      spring.jpa.database-platform: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_SHOW_SQL: "true"
 
 volumes:
   mysql_data:
+  pg_data:
+
 
 
 
